@@ -131,6 +131,7 @@ const Login = () => {
           {type === 'account' && (
             <>
               <ProFormText
+                initialValue="admin"
                 name="username"
                 fieldProps={{
                   size: 'large',
@@ -153,6 +154,7 @@ const Login = () => {
                 ]}
               />
               <ProFormText.Password
+                initialValue="ant.design"
                 name="password"
                 fieldProps={{
                   size: 'large',
