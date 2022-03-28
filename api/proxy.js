@@ -8,7 +8,7 @@ module.exports = (req, res) => {
   // 这里使用 backend 主要用于区分 vercel serverless 的 api 路径
   // xxxxx 替换为你跨域请求的服务器 如： http://baidu.com
   if (req.url.startsWith('/backend')) {
-    target = 'https://preview.pro.ant.design';
+    target = 'https://proapi.azurewebsites.net';
   }
   // 创建代理对象并转发请求
   createProxyMiddleware({
