@@ -77,13 +77,13 @@ export const layout = ({ initialState }) => {
   };
 };
 
-// export const request = {
-//   requestInterceptors: [
-//     (url, options) => {
-//       console.log(options, 'options');
-//       return {
-//         url: `/backend${url}`,
-//       };
-//     },
-//   ],
-// };
+export const request = {
+  requestInterceptors: [
+    (url, options) => {
+      console.log(options, 'options');
+      return {
+        url: `/backend${url}`,
+      };
+    },
+  ],
+};
