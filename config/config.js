@@ -70,13 +70,19 @@ export default defineConfig({
       routes: [
         {
           path: '/dashboard',
-          redirect: '/dashboard/analysis',
+          redirect: '/dashboard/stock',
         },
+        // {
+        //   name: 'analysis',
+        //   icon: 'smile',
+        //   path: '/dashboard/analysis',
+        //   component: './dashboard/analysis',
+        // },
         {
-          name: 'analysis',
+          name: 'stock',
           icon: 'smile',
-          path: '/dashboard/analysis',
-          component: './dashboard/analysis',
+          path: '/dashboard/stock',
+          component: './dashboard/stock',
         },
         // {
         //   name: 'monitor',
@@ -309,7 +315,7 @@ export default defineConfig({
     // },
     {
       path: '/',
-      redirect: '/dashboard/analysis',
+      redirect: '/dashboard/stock',
     },
     {
       component: '404',

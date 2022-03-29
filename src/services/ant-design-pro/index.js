@@ -5,7 +5,9 @@
 // API 唯一标识：
 import * as api from './api';
 import * as login from './login';
+import * as stock from './stock';
 export default {
   api,
   login,
+  stock,
 };
