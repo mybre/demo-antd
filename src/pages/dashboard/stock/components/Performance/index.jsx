@@ -8,7 +8,7 @@ const Page = ({ options }) => {
         marginTop: 32,
       }}
     >
-      <ReactECharts option={options} style={{ height: '60vh' }} />
+      <ReactECharts option={options} style={{ height: '50vh' }} />
     </Card>
   );
 };

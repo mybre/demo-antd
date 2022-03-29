@@ -1,14 +1,13 @@
-import { Suspense, useState } from 'react';
-import { GridContent } from '@ant-design/pro-layout';
-import { useRequest } from 'umi';
+import { useRequest } from 'ahooks';
+import React from 'react';
 import PageLoading from './components/PageLoading';
 import Performance from './components/Performance';
-import { query } from '@/services/ant-design-pro/stock';
-
-const Analysis = () => {
-  console.log(2);
-
-  const { data, loading, error } = useRequest(query, {
+import { query, getData } from '@/services/ant-design-pro/stock';
+import { Suspense, useState } from 'react';
+import { GridContent } from '@ant-design/pro-layout';
+import StockSelect from "@/pages/dashboard/stock/components/StockSelect";
+export default () => {
+  const { data: queryData, loading, error } = useRequest(query, {
     defaultParams: {
       input: '123',
       type: '14',
@@ -17,9 +16,6 @@ const Analysis = () => {
       count: 5,
     },
   });
-  console.log(data, 'data');
-  console.log(loading, 'loading');
-  console.log(error, 'error');
   const options = {
     grid: { top: 8, right: 8, bottom: 24, left: 36 },
     xAxis: {
@@ -40,15 +36,21 @@ const Analysis = () => {
       trigger: 'axis',
     },
   };
+  console.log(queryData, 'data')
+  if(error) {
+    return <div>error</div>
+  }
+  if(loading) {
+    return <PageLoading />
+  }
   return (
     <GridContent>
       <>
         <Suspense fallback={<PageLoading />}>
+          <StockSelect response={queryData}/>
           <Performance options={options} />
         </Suspense>
       </>
     </GridContent>
   );
 };
-
-export default Analysis;

@@ -1,5 +1,7 @@
 import jsonp from 'fetch-jsonp';
 import qs from 'qs';
+import { request } from 'umi';
+
 export function query(param) {
   return new Promise((resolve, reject) => {
     const str = qs.stringify(param);
@@ -7,17 +9,19 @@ export function query(param) {
       jsonpCallback: 'cb',
     })
       .then((response) => response.json())
-      .then((data) => resolve('1'))
+      .then((data) => {
+        resolve(data);
+      })
       .catch(function (err) {
         return reject(err);
       });
   });
 }
 
-// export function query(param) {
-//   return new Promise((resolve, reject) => {
-//     setTimeout(() => {
-//       resolve('123123');
-//     }, 1000);
-//   });
-// }
+export function getData(params, options) {
+  return request('https://datacenter-web.eastmoney.com/api/get', {
+    method: 'GET',
+    params: { ...params },
+    ...(options || {}),
+  });
+}
