@@ -1,5 +1,5 @@
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { useBoolean, useControllableValue } from 'ahooks';
+import { useBoolean, useControllableValue } from 'ahooks-v2';
 import { Tag } from 'antd';
 import classNames from 'classnames';
 import React from 'react';
