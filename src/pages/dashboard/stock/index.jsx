@@ -3,19 +3,15 @@ import React from 'react';
 import PageLoading from './components/PageLoading';
 import Performance from './components/Performance';
 import { query, getData } from '@/services/ant-design-pro/stock';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { GridContent } from '@ant-design/pro-layout';
-import StockSelect from "@/pages/dashboard/stock/components/StockSelect";
+import StockSelect from '@/pages/dashboard/stock/components/StockSelect';
+
 export default () => {
-  const { data: queryData, loading, error } = useRequest(query, {
-    defaultParams: {
-      input: '123',
-      type: '14',
-      token: 'D43BF722C8E33BDC906FB84D85E326E8',
-      securitytype: '1,2,3,4,25,27',
-      count: 5,
-    },
-  });
+  const [stock, setStock] = useState(null);
+  useEffect(() => {
+    console.log('effect');
+  }, [stock]);
   const options = {
     grid: { top: 8, right: 8, bottom: 24, left: 36 },
     xAxis: {
@@ -36,18 +32,12 @@ export default () => {
       trigger: 'axis',
     },
   };
-  console.log(queryData, 'data')
-  if(error) {
-    return <div>error</div>
-  }
-  if(loading) {
-    return <PageLoading />
-  }
+
   return (
     <GridContent>
       <>
         <Suspense fallback={<PageLoading />}>
-          <StockSelect response={queryData}/>
+          <StockSelect onChange={(value) => setStock(value)} />
           <Performance options={options} />
         </Suspense>
       </>
