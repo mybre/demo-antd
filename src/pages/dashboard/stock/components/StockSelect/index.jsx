@@ -1,4 +1,5 @@
-import { Select } from 'antd';
+import { Select, Spin } from 'antd';
+import debounce from 'lodash/debounce';
 import jsonp from 'fetch-jsonp';
 import qs from 'qs';
 import React, { useState } from 'react';
@@ -8,41 +9,41 @@ import PageLoading from '@/pages/dashboard/stock/components/PageLoading';
 
 const { Option } = Select;
 
-export default function StockSelect({ onChange }) {
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState(null);
-  const onSearch = (queryText) => {
-    setLoading(true);
-    setData(null);
-    query({
-      input: queryText,
-      type: '14',
-      token: 'D43BF722C8E33BDC906FB84D85E326E8',
-      securitytype: '1,2,3,4,25,27',
-      count: 5,
-    })
-      .then((res) => {
-        setData(res);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
+function DebounceSelect({ fetchOptions, debounceTimeout = 800, ...props }) {
+  const [fetching, setFetching] = React.useState(false);
+  const [options, setOptions] = React.useState([]);
+  const fetchRef = React.useRef(0);
+  const debounceFetcher = React.useMemo(() => {
+    const loadOptions = (value) => {
+      fetchRef.current += 1;
+      const fetchId = fetchRef.current;
+      setOptions([]);
+      setFetching(true);
+      fetchOptions(value).then((newOptions) => {
+        if (fetchId !== fetchRef.current) {
+          // for fetch callback order
+          return;
+        }
+        setOptions(newOptions);
+        setFetching(false);
       });
-  };
+    };
 
+    return debounce(loadOptions, debounceTimeout);
+  }, [fetchOptions, debounceTimeout]);
   return (
     <Select
-      loading={loading}
-      allowClear
-      showSearch
-      onSearch={onSearch}
       labelInValue
+      showSearch
+      allowClear
+      filterOption={false}
       optionLabelProp={'label'}
-      onChange={onChange}
-      style={{ width: 200 }}
+      onSearch={debounceFetcher}
+      notFoundContent={fetching ? <Spin size="small" /> : null}
+      {...props}
     >
-      {data &&
-        data?.QuotationCodeTable?.Data?.map((item) => {
+      {options &&
+        options?.QuotationCodeTable?.Data?.map((item) => {
           return (
             <Option label={item.Name} key={item.Code} value={item.Code}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -53,5 +54,37 @@ export default function StockSelect({ onChange }) {
           );
         })}
     </Select>
+  );
+} // Usage of DebounceSelect
+
+async function fetchOptions(queryText) {
+  return new Promise((resolve) => {
+    query({
+      input: queryText,
+      type: '14',
+      token: 'D43BF722C8E33BDC906FB84D85E326E8',
+      securitytype: '1,2,3,4,25,27',
+      count: 5,
+    }).then((data) => {
+      resolve(data);
+    });
+  });
+}
+
+export default function StockSelect({ onChange }) {
+  const [value, setValue] = React.useState(null);
+  return (
+    <DebounceSelect
+      value={value}
+      placeholder="Select stock"
+      fetchOptions={fetchOptions}
+      onChange={(newValue) => {
+        setValue(newValue);
+        onChange(newValue)
+      }}
+      style={{
+        width: '100%',
+      }}
+    />
   );
 }

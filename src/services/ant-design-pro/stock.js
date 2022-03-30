@@ -19,7 +19,7 @@ export function query(param) {
 }
 
 export function getData(params, options) {
-  return request('https://datacenter-web.eastmoney.com/api/get', {
+  return request('https://datacenter-web.eastmoney.com/api/data/v1/get', {
     method: 'GET',
     params: { ...params },
     ...(options || {}),
