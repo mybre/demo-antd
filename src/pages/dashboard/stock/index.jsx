@@ -218,7 +218,7 @@ export default () => {
               marginTop: 32,
             }}
           >
-            <ReactECharts option={options} style={{ height: '50vh' }} />
+            <ReactECharts option={options} style={{ height: 600 }} />
           </Card>
         </Suspense>
       </>
