@@ -1,38 +1,45 @@
-import { useRequest } from 'ahooks';
 import React from 'react';
 import PageLoading from './components/PageLoading';
-import Performance from './components/Performance';
 import { getData } from '@/services/ant-design-pro/stock';
 import { Suspense, useState, useEffect } from 'react';
 import { GridContent } from '@ant-design/pro-layout';
 import StockSelect from '@/pages/dashboard/stock/components/StockSelect';
-function numberFormat(value) {
-  const param = {};
-  const k = 1000;
-  const sizes = ['千', '万', '亿', '万亿'];
-  let i;
-  if (value < k) {
-    param.value = value;
-    param.unit = '';
-  } else {
-    i = Math.floor(Math.log(value) / Math.log(k));
+import ReactECharts from 'echarts-for-react';
+import { Card } from 'antd';
 
-    param.value = (value / Math.pow(k, i)).toFixed(2);
-    param.unit = sizes[i];
-  }
-  return param;
+function convertUint(t) {
+  let e = Number(t);
+  let n = 1;
+  // eslint-disable-next-line no-sequences,no-return-assign
+  return (
+    e < 0 && (n = -1),
+    (e = Math.abs(e)),
+    // eslint-disable-next-line no-void
+    isNaN(e)
+      ? '--'
+      : e < 1e4
+      ? e.toFixed(2) * n
+      : e >= 1e4 && e < 1e8
+      ? (e / 1e4).toFixed(2) * n + '万'
+      : e >= 1e8
+      ? (e / 1e8).toFixed(2) * n + '亿'
+      : void 0
+  );
 }
+
 const formatData = (res) => {
   const BASIC_EPS = {
     name: '每股收益',
     type: 'line',
     yAxisIndex: '0',
+    smooth: true,
     data: res.result.data.map((v) => v.BASIC_EPS),
   };
   const TOTAL_OPERATE_INCOME = {
     name: '营业收入',
     type: 'line',
     yAxisIndex: '1',
+    smooth: true,
     data: res.result.data.map((v) => v.TOTAL_OPERATE_INCOME),
   };
   const color = ['#5470C6', '#91CC75', '#EE6666'];
@@ -41,6 +48,7 @@ const formatData = (res) => {
     name: '归属净利润',
     type: 'line',
     yAxisIndex: '2',
+    smooth: true,
     data: res.result.data.map((v) => v.PARENT_NETPROFIT),
   };
 
@@ -73,7 +81,7 @@ const formatData = (res) => {
       },
       axisLabel: {
         formatter: (value) => {
-          return numberFormat(value);
+          return convertUint(value);
         },
       },
     },
@@ -91,7 +99,7 @@ const formatData = (res) => {
       },
       axisLabel: {
         formatter: (value) => {
-          return numberFormat(value);
+          return convertUint(value);
         },
       },
     },
@@ -121,13 +129,22 @@ const formatData = (res) => {
       type: 'line',
     },
     formatter: (params) => {
-      let str = params[0].name + '<br/>';
+      const title = `<div>${params[0].name}</div>`;
+      let line = '';
       for (const item of params) {
-        str = `${str}<span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${
-          item.color
-        }"></span>${item.seriesName}:${numberFormat(item.value)}<br/>`;
+        // eslint-disable-next-line no-unused-expressions
+        line += `<div style="display:flex;justify-content: space-between;align-items: center;width: 200px">
+                <div>
+                  <span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${
+                    item.color
+                  }"></span>
+                  <span>${item.seriesName}<span>
+                </div>
+                <div>${convertUint(item.value)} 元</div>
+              </div>
+              `;
       }
-      return str;
+      return title + line;
     },
   };
   const toolbox = {
@@ -137,15 +154,21 @@ const formatData = (res) => {
       saveAsImage: { show: true },
     },
   };
-  const grid = { top: 8, right: 8, bottom: 24, left: 36 };
-
-  return { color, toolbox, tooltip, legend, series, xAxis, yAxis, grid };
+  const grid = { containLabel: true };
+  console.log(legend, 'eeeeellll');
+  // return { color, toolbox, tooltip, legend, series, xAxis, yAxis, grid };
+  return { xAxis, series, yAxis, color, grid, tooltip };
+  // return {
+  //   xAxis: {
+  //     type: 'category',
+  //     data: ['Mon1', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  //   },
+  // };
 };
 
 export default () => {
   const [stock, setStock] = useState({ value: '600519' });
   const [options, setOptions] = useState({
-    grid: { top: 8, right: 8, bottom: 24, left: 36 },
     xAxis: {
       type: 'category',
       data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
@@ -176,7 +199,8 @@ export default () => {
         filter: `(SECURITY_CODE="${stock.value}")`,
         reportName: 'RPT_LICO_FN_CPD_BB',
       }).then((res) => {
-        setOptions(formatData(res));
+        res?.result?.data?.reverse();
+        setOptions({ ...options, ...formatData(res) });
       });
     }
   }, [stock]);
@@ -186,7 +210,15 @@ export default () => {
       <>
         <Suspense fallback={<PageLoading />}>
           <StockSelect onChange={(value) => setStock(value)} />
-          <Performance options={options} />
+
+          <Card
+            bordered={false}
+            style={{
+              marginTop: 32,
+            }}
+          >
+            <ReactECharts option={options} style={{ height: '50vh' }} />
+          </Card>
         </Suspense>
       </>
     </GridContent>
