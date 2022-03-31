@@ -6,6 +6,7 @@ import { GridContent } from '@ant-design/pro-layout';
 import StockSelect from '@/pages/dashboard/stock/components/StockSelect';
 import ReactECharts from 'echarts-for-react';
 import { Card } from 'antd';
+import { configResponsive, useResponsive } from 'ahooks';
 
 function convertUint(t) {
   let e = Number(t);

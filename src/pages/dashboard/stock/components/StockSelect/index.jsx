@@ -1,11 +1,7 @@
 import { Select, Spin } from 'antd';
 import debounce from 'lodash/debounce';
-import jsonp from 'fetch-jsonp';
-import qs from 'qs';
-import React, { useState } from 'react';
+import React from 'react';
 import { query } from '@/services/ant-design-pro/stock';
-import { useRequest } from 'ahooks';
-import PageLoading from '@/pages/dashboard/stock/components/PageLoading';
 
 const { Option } = Select;
 
@@ -80,7 +76,7 @@ export default function StockSelect({ onChange }) {
       fetchOptions={fetchOptions}
       onChange={(newValue) => {
         setValue(newValue);
-        onChange(newValue)
+        onChange(newValue);
       }}
       style={{
         width: '100%',
